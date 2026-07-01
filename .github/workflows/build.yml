@@ -1,24 +1,28 @@
 name: Build Android APK
-on:
-  push:
-    branches:
-      - main
+on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Node.js
+
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-      - name: Install dependencies
-        run: npm install
-      - name: Build
+          node-version: '20'
+
+      - name: Install Capacitor and Build
+        run: |
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npx cap add android || echo "Android already exists"
+          npx cap sync
+          
+      - name: Build APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
